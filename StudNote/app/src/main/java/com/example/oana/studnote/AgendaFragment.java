@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 /**
  * Created by Oana on 1/9/2015.
@@ -17,6 +19,7 @@ import android.widget.ImageButton;
 public class AgendaFragment extends Fragment {
     private static final String TAG = "AgendaFragment";
     private ImageButton backButton;
+    private CalendarView calendarView;
     private Fragment homeFragment;
 
 
@@ -35,6 +38,33 @@ public class AgendaFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 showHomeOnClick();
+            }
+        });
+        calendarView = (CalendarView) view.findViewById(R.id.calendar_agenda);
+        // sets whether to show the week number.
+        calendarView.setShowWeekNumber(false);
+        // sets the first day of week according to Calendar.
+        // here we set Monday as the first day of the Calendar
+
+        calendarView.setFirstDayOfWeek(2);
+        //The background color for the selected week.
+
+        calendarView.setSelectedWeekBackgroundColor(getResources().getColor(R.color.red));
+        //sets the color for the dates of an unfocused month.
+        calendarView.setUnfocusedMonthDateColor(getResources().getColor(R.color.transparent));
+        //sets the color for the separator line between weeks.
+        calendarView.setWeekSeparatorLineColor(getResources().getColor(R.color.transparent));
+        //sets the color for the vertical bar shown at the beginning and at the end of the selected date.
+
+        calendarView.setSelectedDateVerticalBar(R.color.darkred);
+        //sets the listener to be notified upon selected date change.
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            //show the selected date as a toast
+            @Override
+
+            public void onSelectedDayChange(CalendarView view, int year, int month, int day) {
+
+                Toast.makeText(getActivity(), day + "/" + month + "/" + year, Toast.LENGTH_LONG).show();
             }
         });
 

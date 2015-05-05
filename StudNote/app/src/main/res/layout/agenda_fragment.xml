@@ -13,7 +13,8 @@
         android:layout_gravity="top"
         android:gravity="top"
         android:id="@+id/agenda_header_layout"
-        android:background="#c0505e">
+        android:background="#c0505e"
+        android:focusable="false">
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -38,7 +39,8 @@
     <CalendarView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/calendarAgenda"
-        android:layout_gravity="center_horizontal" />
+        android:id="@+id/calendar_agenda"
+        android:layout_gravity="center_horizontal"
+        android:focusable="false" />
 
 </LinearLayout>

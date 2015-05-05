@@ -36,4 +36,42 @@
             android:background="#c0505e" />
     </LinearLayout>
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="10dp"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lbl_about_us"
+            android:id="@+id/txt_about"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="10dp"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lbl_names"
+            android:id="@+id/txt_names"
+            android:layout_gravity="left|center_horizontal"
+            android:layout_margin="10dp" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:text="@string/lbl_about"
+            android:id="@+id/txt_about_info"
+            android:layout_weight="2.07"
+            android:layout_margin="10dp"
+            android:textSize="14sp" />
+
+
+    </LinearLayout>
+
 </LinearLayout>

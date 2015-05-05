@@ -2,6 +2,8 @@ package com.example.oana.studnote;
 
 import android.widget.BaseAdapter;
 
+import com.example.oana.studnote.database.Courses;
+
 
 /**
  * Created by ohotescu on 20/08/14.
@@ -27,6 +29,17 @@ public class CoursesListElement {
         this.other = other;
         this.requestCode = requestCode;
     }
+
+    public CoursesListElement(Courses courses, int requestCode) {
+        this.courses = courses.getName();
+        this.teacher = courses.getTeacher();
+        this.where = courses.getPlace();
+        this.when = courses.getTime();
+        this.grading = courses.getGrading();
+        this.other = courses.getOther();
+        this.requestCode = requestCode;
+    }
+
 
     public void setAdapter(BaseAdapter adapter) {
         this.adapter = adapter;
@@ -80,5 +93,17 @@ public class CoursesListElement {
         return grading;
     }
 
-
+    @Override
+    public String toString() {
+        return "CoursesListElement{" +
+                "courses='" + courses + '\'' +
+                ", teacher='" + teacher + '\'' +
+                ", where='" + where + '\'' +
+                ", when='" + when + '\'' +
+                ", other='" + other + '\'' +
+                ", grading='" + grading + '\'' +
+                ", requestCode=" + requestCode +
+                ", adapter=" + adapter +
+                '}';
+    }
 }

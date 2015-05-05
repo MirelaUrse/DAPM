@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
+import com.example.oana.studnote.database.DataSource;
+
 public class MainActivity extends ActionBarActivity {
     private static final String TAG = "MainActivity";
     //constants used to manipulate the fragments
@@ -21,12 +23,15 @@ public class MainActivity extends ActionBarActivity {
     private static final int FRAGMENT_COUNT =2;
     private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];//array of fragments
     private boolean isResumed = false;//flag that enables session state change checks
+    DataSource dataSource;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        //database initialisation
+        dataSource = new DataSource(getApplicationContext());
         // Check whether the activity is using the layout version with
         // the fragment_container FrameLayout. If so, we must add the first fragment
         if (findViewById(R.id.fragment_container) != null) {
@@ -51,7 +56,11 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-
+    //get the data source
+    public DataSource getDataSource()
+    {
+        return dataSource;
+    }
 
     /**Show a given fragment and hide all others fragments
      * @param fragmentIndex the fragment'index in the array of fragments

@@ -1,22 +1,35 @@
 package com.example.oana.studnote;
 import android.app.Activity;
+import android.content.Context;
+import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
-import android.widget.ExpandableListAdapter;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
+
+import com.example.oana.studnote.database.Courses;
+import com.example.oana.studnote.database.DataSource;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -27,16 +40,24 @@ public class CoursesFragment extends Fragment {
     private static final String TAG = "CoursesFragment";
     private ImageButton backButton;
     private ImageButton addButton;
+    private Button addConfirmButton;
+
     private LinearLayout newCourses;
-    private ExpandableListView listView;
+    private EditText editTextCourses;
+    private EditText editTextTeacher;
+    private EditText editTextWhen;
+    private EditText editTextWhere;
+    private EditText editTextGrading;
+    private EditText editTextOther;
 
-    private List<CoursesListElement> listElements;
+    DataSource dataSource;
 
-
+    ExpandableListAdapter listAdapter;
+    ListView listView;
+    List<String> listDataHeader;
+    List<CoursesListElement> listElements;
 
     private Fragment homeFragment;
-
-
     private OnFragmentInteractionListener mListener;
 
     @Override
@@ -45,32 +66,73 @@ public class CoursesFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.courses_fragment, container, false);
 
-
+        if(savedInstanceState!=null){
+            Parcelable listState = savedInstanceState.getParcelable("ListState");
+            //expListView.setAdapter(new android.widget.ExpandableListAdapter());
+        }
 
         backButton = (ImageButton) view.findViewById(R.id.back_button);
         addButton = (ImageButton) view.findViewById(R.id.add_button);
+        addConfirmButton = (Button)view.findViewById(R.id.btn_add);
+
+
+        editTextCourses = (EditText) view.findViewById(R.id.txt_courses);
+        editTextTeacher = (EditText) view.findViewById(R.id.txt_teacher);
+        editTextWhen = (EditText) view.findViewById(R.id.txt_when);
+        editTextWhere = (EditText) view.findViewById(R.id.txt_where);
+        editTextGrading = (EditText) view.findViewById(R.id.txt_grading);
+        editTextOther = (EditText) view.findViewById(R.id.txt_other);
+        Log.i(TAG,"Error in on view create");
         newCourses = (LinearLayout) view.findViewById(R.id.new_courses_layout);
-        listView = (ExpandableListView)view.findViewById(R.id.expandable_courses);
+
+        listView = (ListView) view.findViewById(R.id.list_courses);
+        // Set up the list view items, based on a list of
+        // BaseListElement items
+
+        MainActivity mainActivity=(MainActivity)getActivity();
+        dataSource=mainActivity.getDataSource();
+        dataSource.open();
+        List<Courses> coursesList = dataSource.getAllCourses();
+        dataSource.close();
+
         listElements = new ArrayList<CoursesListElement>();
-        //listElements.setAdapter(new BaseExpandableListAdapter());
-        //listView.setAdapter(new ListAdapter(getActivity(),R.id.expandable_courses, listElements));
+        if(coursesList.size()!=0)
+            Log.d(TAG,""+coursesList.size());
+        {
+            for (Courses courses:coursesList)
+            {
+                Log.d(TAG,courses.toString());
+                CoursesListElement coursesListElement = new CoursesListElement(courses,0);
+                Log.d(TAG,coursesListElement.toString());
+                listElements.add(coursesListElement);
+            }
+        }
+        listView.setAdapter(new ActionListAdapter(getActivity(),R.id.list_courses, listElements));
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showHomeOnClick();
             }
         });
-
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showNewCoursesLayoutOnClick();
             }
         });
-
-
+        addConfirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addNewCoursesOnClick();
+            }
+        });
         return view;
     }
+
+    /*
+     * Preparing the list data
+     */
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -124,10 +186,29 @@ public class CoursesFragment extends Fragment {
         ft.addToBackStack(null);
         ft.commit();
     }
+
     private void showNewCoursesLayoutOnClick(){
         //set the layout visible for adding a courses
         newCourses.setVisibility(View.VISIBLE);
 
+    }
+
+    private void addNewCoursesOnClick(){
+        //add new courses to the expandable list
+        dataSource.open();
+        dataSource.createCourses(editTextCourses.getText().toString(),editTextTeacher.getText().toString(),editTextWhen.getText().toString(),editTextWhere.getText().toString(),editTextGrading.getText().toString(),editTextOther.getText().toString());
+        dataSource.close();
+        CoursesListElement courses = new CoursesListElement(editTextCourses.getText().toString(),editTextTeacher.getText().toString(),editTextWhen.getText().toString(),editTextWhere.getText().toString(),editTextGrading.getText().toString(),editTextOther.getText().toString(),0);
+        listElements.add(courses);
+        // setting list adapter
+        listView.setAdapter(new ActionListAdapter(getActivity(),R.id.list_courses, listElements));
+        newCourses.setVisibility(View.GONE);
+        editTextCourses.setText("");
+        editTextTeacher.setText("");
+        editTextWhen.setText("");
+        editTextWhere.setText("");
+        editTextGrading.setText("");
+        editTextOther.setText("");
     }
 
     @Override
@@ -149,7 +230,59 @@ public class CoursesFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
     }
 
+    /*
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        Parcelable listState = savedInstanceState.getParcelable("ListState");
+        listView.onRestoreInstanceState(listState);
+    }*/
 
+    private class ActionListAdapter extends ArrayAdapter<CoursesListElement> {
+        private List<CoursesListElement> listElements;
+
+        public ActionListAdapter(Context context, int resourceId, List<CoursesListElement> listElements) {
+            super(context, resourceId, listElements);
+            this.listElements = listElements;
+            // Set up as an observer for list item changes to
+            // refresh the view.
+            for (int i = 0; i < listElements.size(); i++) {
+                listElements.get(i).setAdapter(this);
+            }
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (view == null) {
+                LayoutInflater inflater =
+                        (LayoutInflater) getActivity()
+                                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.courses_list_item, null);
+            }
+
+            CoursesListElement listElement = listElements.get(position);
+            if (listElement != null) {
+                //view.setOnClickListener(listElement.getOnClickListener());
+                TextView txtCourses = (TextView) view.findViewById(R.id.txt_courses_item);
+                TextView txtTeacher = (TextView) view.findViewById(R.id.txt_teacher_item);
+                TextView txtWhen = (TextView) view.findViewById(R.id.txt_when_item);
+                TextView txtWhere = (TextView) view.findViewById(R.id.txt_where_item);
+                TextView txtGrading = (TextView) view.findViewById(R.id.txt_grading_item);
+                TextView txtOther = (TextView) view.findViewById(R.id.txt_other_item);
+
+                txtCourses.setText(listElement.getCourses());
+                txtTeacher.setText(listElement.getTeacher());
+                txtWhen.setText(listElement.getWhen());
+                txtWhere.setText(listElement.getWhere());
+                txtGrading.setText(listElement.getGrading());
+                txtOther.setText(listElement.getOther());
+
+            }
+            return view;
+        }
+    }
 }
